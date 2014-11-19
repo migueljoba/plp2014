@@ -159,6 +159,20 @@ class VisitaControlador():
 		else:
 			return id_visita
 
+	def esta_adentro(self, cedula):
+		""" esta_adentro(str) -> Booleano
+			Método para verificar si la visita se encuentra en curso.
+		"""
+		ultima_visita = self.ultima_visita(cedula)
+		id_visita = ultima_visita.get_id_visita()
+		s = shelve.open(visita_db)
+		tmp_visita = s[id_visita]
+		s.close()
+		if tmp_visita.get_hora_salida() is not None:
+			return False	# Ya mercó salida en última visita. Terminó la visita
+		else:
+			return True		# Ultima visita no tiene marcada hora de salida. Se encuentra en curso la visita.
+
 	def marcar_entrada(self, cedula):
 		id_visitante = cedula
 
@@ -278,8 +292,89 @@ class BicicletaControlador(AlquilableControlador):
 
 		s.close()
 	
-	def alquilar(self):
-		pass
+	def alquilar(self, cedula, nro_solicitado, tiempo_alquiler):
+		# pedimos la lista de los IDs de las bicis disponibles
+		lista = self.lista_disponible()[:nro_solicitado]
 
-	def devolver(self):
-		pass
+		s = shelve.open(bici_db)
+
+		for id_bici in lista:
+			tmp = s[id_bici]
+			tmp.set_estado("NO DISPONIBLE")
+			tmp.set_cedula_solicitante(cedula)
+			tmp.set_tiempo_alquiler(tiempo_alquiler)
+
+			s[id_bici] = tmp
+
+		s.close()
+
+		return nro_solicitado * tiempo_alquiler * 10000
+		
+	def devolver(self, cedula):
+		lista = self.lista_no_disponible()
+		
+		s = shelve.open(bici_db)
+
+		for id_bici in lista:
+			if s[id_bici].get_cedula_solicitante() == cedula:
+				tmp = s[id_bici]
+				tmp.set_estado("DISPONIBLE")
+				tmp.set_cedula_solicitante(None)
+				tmp.set_tiempo_alquiler(None)
+				s[id_bici] = tmp
+		s.close()
+
+
+	def validar_solicitante(self, cedula):
+		"""	validar_solicitante(str) -> Booleano
+			Determina si el solicitante se encuentra o no dentro dentro del parque; condición 
+			necesaria para alquilar.
+		"""
+		# la persona existe en BD y actualmente de visita?
+		if PersonaControlador().existe(cedula) and VisitaControlador().esta_adentro(cedula):
+			return True
+		else:
+			return False
+
+	def validar_cantidad_solicitada(self, nro_solicitado):
+		nro_disponible = self.cantidad_disponible()
+
+		if int(nro_solicitado) > nro_disponible:
+			return False
+		else:
+			return True
+
+	def lista_disponible(self):
+		s = shelve.open(bici_db)
+		lista_disponible = [b.get_id_num() for b in s.values() if b.get_estado() == "DISPONIBLE"]
+		s.close()
+		return lista_disponible
+
+	def lista_no_disponible(self):
+		s = shelve.open(bici_db)
+		lista_no_disponible = [b.get_id_num() for b in s.values() if b.get_estado() != "DISPONIBLE"]
+		s.close()
+		return lista_no_disponible
+
+	def cantidad_disponible(self):
+		return len(self.lista_disponible())
+
+	def marcar_no_disponible(self, lista_id):
+		s = shelve.open(bici_db)
+
+		for id_bici in lista_id:
+			tmp = s[id_bici]
+			tmp.set_estado("NO DISPONIBLE")
+			s[id_bici] = tmp
+
+		s.close()
+
+	def marcar_disponible(self, lista_id):
+		s = shelve.open(bici_db)
+		for id_bici in lista_id:
+			tmp = s[id_bici]
+			tmp.set_estado("DISPONIBLE")
+			s[id_bici] = tmp
+
+		s.close()
+

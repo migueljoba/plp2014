@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from controladores import PersonaControlador, VisitaMenorControlador, VisitaControlador
+from controladores import PersonaControlador, VisitaMenorControlador, VisitaControlador, BicicletaControlador
 import util
 
 util.limpiar_pantalla()
@@ -95,13 +95,41 @@ def salir():
 	exit()
 
 def alquilar_bici():
-	pass
+	disponible = BicicletaControlador().cantidad_disponible()
+	
+	if disponible == 0:
+		print("No hay bicicletas disponibles en este momento.")
+	
+	else:
+		mensaje = "Existen {0} bicicletas disponible(s).\n".format(disponible)
+		print(mensaje)
+
+		cedula = util.leer_cadena("Ingrese el nro. de cédula del solicitante: ", requerido=True)
+		if not BicicletaControlador().validar_solicitante(cedula):
+			print("Esta cédula no corresponde a alguien presente en el parque.")
+			return False
+
+		nro_solicitado = util.leer_entero("¿Cuántas desea alquilar?: ", min_val=1, max_val=20, requerido=True)
+		
+		# booleano
+		cantidad_valida = BicicletaControlador().validar_cantidad_solicitada(nro_solicitado)
+
+		if not cantidad_valida:
+			print("No existen suficientes bicicletas disponibles.")
+			util.presiona_continuar()
+			alquilar_bici()
+
+		tiempo_alquiler = opcion = util.leer_entero("Tiempo de alquiler, en horas: ", min_val=1, max_val=8, requerido=True)
+
+		monto_alquiler = BicicletaControlador().alquilar(cedula, nro_solicitado, tiempo_alquiler)
+		print("El monto a abonar es: Gs " + str(monto_alquiler))
+
+	util.presiona_continuar()
 
 def devolver_bici():
-	pass
-
-def registrar_nueva():
-	pass
+	cedula = util.leer_cadena("Ingrese el nro. de cédula de quien devuelve: ", requerido=True)
+	BicicletaControlador().devolver(cedula)
+	util.presiona_continuar()
 
 def menu_bicicleta():
 	menu_bici = {}
@@ -110,11 +138,10 @@ def menu_bicicleta():
 
 	menu_bici[1] = {titulo: "Alquilar", funcion: alquilar_bici}
 	menu_bici[2] = {titulo: "Devolver", funcion: devolver_bici}
-	menu_bici[3] = {titulo: "Registrar nueva", funcion: registrar_nueva}
-	menu_bici[4] = {titulo: "Volver al menú principal", funcion: menu_principal}
+	menu_bici[3] = {titulo: "Volver al menú principal", funcion: menu_principal}
 
 	while True:
-		util.limpiar_pantalla()
+		# util.limpiar_pantalla()
 		print("-------------------MENU BICICLETA-------------------------")
 		for key in menu_bici.keys():
 			print("{}- {}".format(key, menu_bici[key][titulo]))

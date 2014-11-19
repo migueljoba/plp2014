@@ -110,12 +110,11 @@ class VisitaMenor(Visita):
 		self.__cedula_adulto = cedula_adulto
 
 class Alquilable():
-	def __init__(self, cedula_solicitante=None, estado=None, hora_inicio=None, hora_fin=None, precio_hora=None):
+	def __init__(self, cedula_solicitante=None, estado=None, tiempo_alquiler=None, precio_hora=None):
 		self.__cedula_solicitante = cedula_solicitante
 		self.__estado = estado
-		self.__hora_inicio = hora_inicio
-		self.__hora_fin = hora_fin
-		self.__precio = precio
+		self.__tiempo_alquiler = tiempo_alquiler
+		self.__precio_hora = precio_hora
 
 	def get_cedula_solicitante(self):
 		return self.__cedula_solicitante
@@ -129,23 +128,17 @@ class Alquilable():
 	def set_estado(self, estado):
 		self.__estado = estado
 
-	def get_hora_inicio(self):
-		return self.__hora_inicio
+	def get_tiempo_alquiler(self):
+		return self.__tiempo_alquiler
 
-	def set_hora_inicio(self, hora_inicio):
-		self.__hora_inicio = hora_inicio
+	def set_tiempo_alquiler(self, tiempo_alquiler):
+		self.__tiempo_alquiler = tiempo_alquiler
 
-	def get_hora_fin(self):
-		return self.__hora_fin
+	def get_precio_hora(self):
+		return self.__precio_hora
 
-	def set_hora_fin(self, hora_fin):
-		self.__hora_fin = hora_fin
-
-	def get_precio(self):
-		return self.__precio
-
-	def set_precio(self, precio):
-		self.__precio = precio
+	def set_precio_hora(self, precio_hora):
+		self.__precio_hora = precio_hora
 
 class Bicicleta(Alquilable):
 
@@ -153,6 +146,8 @@ class Bicicleta(Alquilable):
 
 	def __init__(self, id_num=None, marca=None, **kwargs):
 		super().__init__(**kwargs)
+		self.__id_num = id_num
+		self.__marca = marca
 
 	def get_id_num(self):
 		return self.__id_num
@@ -165,6 +160,10 @@ class Bicicleta(Alquilable):
 
 	def set_marca(self, marca):
 		self.__marca
+
+	def __str__(self):
+		return "Bicicleta['%s','%s', '%s']" % (coalesce(self.__id_num, ''), coalesce(self.__marca,''), coalesce(self.__estado,''))
+
 
 # Para limitar número de instancias de la clase, ver
 # http://stackoverflow.com/questions/11458477/limit-number-of-class-instances-whith-python
