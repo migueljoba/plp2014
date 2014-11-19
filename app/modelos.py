@@ -5,7 +5,6 @@ def coalesce(objeto, default):
         return objeto
 
 class Persona():
-	
 	def __init__(self, cedula=None, nombre=None, apellido=None, edad=None, sexo=None, **kwargs):
 		self.__cedula = cedula
 		self.__nombre = nombre
@@ -46,9 +45,7 @@ class Persona():
 	def __str__(self):
 		return "Persona['%s','%s', '%s']" % (coalesce(self.__cedula, ''), coalesce(self.__nombre,''), coalesce(self.__apellido,''))
 
-
 class Visita():
-	
 	def __init__(self, id_visita=None, id_visitante=None, fecha_visita=None, hora_entrada=None, hora_salida=None, **kwargs):
 		self.__id_visita = id_visita
 		self.__id_visitante = id_visitante
@@ -89,10 +86,7 @@ class Visita():
 	def __str__(self):
 		return "Visita ['%s','%s', '%s', '%s', '%s']" % (coalesce(self.__id_visita, ''), coalesce(self.__id_visitante,''), coalesce(self.__fecha_visita,''), coalesce(self.__hora_entrada,''), coalesce(self.__hora_salida,''))
 
-
-
-class VisitanteMenor():
-
+class PersonaMenor(Persona):	 # deprecar
 	def __init__(self, cedula_adulto=None, **kwargs):
 		super().__init__(**kwargs)
 		self.__cedula_adulto = cedula_adulto
@@ -103,20 +97,37 @@ class VisitanteMenor():
 	def set_cedula_adulto(self, cedula_adulto):
 		self.__cedula_adulto = cedula_adulto
 
+class VisitaMenor(Visita):
+	def __init__(self, cedula_adulto=None, menor_edad=True, **kwargs):
+		super().__init__(**kwargs)
+		self.__cedula_adulto = cedula_adulto
+		self.__menor_edad = menor_edad
+
+	def get_cedula_adulto(self):
+		return self.__cedula_adulto
+
+	def set_cedula_adulto(self, cedula_adulto):
+		self.__cedula_adulto = cedula_adulto
 
 class Alquilable():
-	def __init__(self, cedula_solicitante=None, hora_inicio=None, hora_fin=None, precio=None):
+	def __init__(self, cedula_solicitante=None, estado=None, hora_inicio=None, hora_fin=None, precio_hora=None):
 		self.__cedula_solicitante = cedula_solicitante
+		self.__estado = estado
 		self.__hora_inicio = hora_inicio
 		self.__hora_fin = hora_fin
 		self.__precio = precio
-
 
 	def get_cedula_solicitante(self):
 		return self.__cedula_solicitante
 
 	def set_cedula_solicitante(self, cedula_solicitante):
 		self.__cedula_solicitante = cedula_solicitante
+
+	def get_estado(self):
+		return self.__estado
+
+	def set_estado(self, estado):
+		self.__estado = estado
 
 	def get_hora_inicio(self):
 		return self.__hora_inicio
@@ -136,7 +147,24 @@ class Alquilable():
 	def set_precio(self, precio):
 		self.__precio = precio
 
-
 class Bicicleta(Alquilable):
-	def __init__(self, **kwargs):
+
+	cantidad_bicicletas = 20
+
+	def __init__(self, id_num=None, marca=None, **kwargs):
 		super().__init__(**kwargs)
+
+	def get_id_num(self):
+		return self.__id_num
+
+	def set_id_num(self, id_num):
+		self.__id_num
+
+	def get_marca(self):
+		return self.__marca
+
+	def set_marca(self, marca):
+		self.__marca
+
+# Para limitar número de instancias de la clase, ver
+# http://stackoverflow.com/questions/11458477/limit-number-of-class-instances-whith-python

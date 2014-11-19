@@ -1,26 +1,26 @@
 import shelve
 from abc import ABCMeta, abstractmethod
-from modelos import Persona, Visita
+from modelos import Persona, Visita, VisitaMenor, Bicicleta
 from datetime import datetime, date
 
 import util
 
 persona_db = "persona.db"
 visita_db = "visitante.db"
+bici_db = "bicicleta.db"
 
-class YaExiste(Exception):
+class NoTieneVisita(Exception):
     pass
+class NoExistePersona(Exception):
+	pass
 
-
-
-
-class ControladorMaster():
+class ControladorMaster():	# deprecar
 	
 	def crear(objeto):
 		print("Llama a metodo crear()")
 		id_obj = objeto.get_cedula()
 
-		if s.has_key(id_obj):
+		if s.has_key(id_obj):	 #deprecar
 			print("Ya existe esta persona")
 		s[id_obj] = objeto
 	
@@ -44,7 +44,6 @@ class ControladorMaster():
 	@abstractmethod
 	def destruir(self, objeto):
 		pass
-
 
 class PersonaControlador(ControladorMaster):
 
@@ -85,7 +84,7 @@ class PersonaControlador(ControladorMaster):
 
 		# TODO validar contenido de los parámetros. Prioridad baja
 
-	def destruir(self, id_obj):
+	def destruir(self, id_obj):		# plato de oro ?
 
 		s = shelve.open(persona_db)
 
@@ -97,12 +96,11 @@ class PersonaControlador(ControladorMaster):
 			s.close()
 			
 	def get_id(self, objeto):
-		# print("llama a get_id()")
 		# para una instancia de Persona() ya guardada, su id es su atributo 'cedula' 
 		return objeto.get_cedula()
 
 	def existe(self, cedula):
-		# print("llama a existe()")
+		"""Función que verifica la existencia de una persona en la base de datos"""
 		s = shelve.open(persona_db)
 
 		if cedula in s.keys():
@@ -114,23 +112,64 @@ class PersonaControlador(ControladorMaster):
 
 		return existe
 
-	def recuperar(self, id_obj):
-		
+	def recuperar(self, cedula):
+		"""Función que retorna el objeto Persona, si existe en la base datos"""
 		s = shelve.open(persona_db)
-		tmp = s[id_obj]
+		if cedula not in s.keys():
+			raise NoExistePersona("No existen registros para esta cédula.")
+		tmp = s[cedula]
 		s.close()
 		
 		return tmp
 
-
 class VisitaControlador():
 
-	def crear(self, cedula):
+	def validar_entrada(self, cedula):
+		"""	
+			validar_entrada(cedula) -> None
+			Método para validar entrada de una persona. No pasa la verificación si en la última visita no 
+			se marcó salida. 
+			Provoca excepción si no se supera validación
+		"""
+
+		ultima_visita = self.ultima_visita(cedula)
+		id_visita = ultima_visita.get_id_visita()
+		s = shelve.open(visita_db)
+		tmp_visita = s[id_visita]
+		s.close()
+
+		if tmp_visita.get_hora_salida() is None:
+			raise Exception("No se podrá marcar entrada. Esta persona ya se encuentra dentro parque.")
+
+	def validar_salida(self, cedula):
+		"""	
+			validar_salida(cedula) -> str id de ultima visita
+			Método para validar salida de una persona. Supera la verificación si en la última visita no 
+			se marcó salida. 
+			Provoca excepción si no se supera validación
+		"""
+		ultima_visita = self.ultima_visita(cedula)
+		id_visita = ultima_visita.get_id_visita()
+		s = shelve.open(visita_db)
+		tmp_visita = s[id_visita]
+		s.close()
+
+		if tmp_visita.get_hora_salida() is not None:
+			raise Exception("No se podrá marcar salida. La ultima visita para esta cédula ya tiene marcada una hora de salida.")
+		else:
+			return id_visita
+
+	def marcar_entrada(self, cedula):
 		id_visitante = cedula
 
 		existe_persona = PersonaControlador().existe(cedula)
 
 		if existe_persona:
+			try:
+				self.validar_entrada(cedula)
+			except NoTieneVisita:
+				pass	# No existe ninguna visita para esta cédula. La validación de entrada no fue necesaria.
+
 			s = shelve.open(visita_db)
 
 			total_registros = len(s)
@@ -149,8 +188,7 @@ class VisitaControlador():
 			raise Exception("No existe una persona con la cédula indicada.")
 
 	def marcar_salida(self, cedula):
-		ultima_visita = self.ultima_visita(cedula)
-		id_visita = ultima_visita.get_id_visita()
+		id_visita = self.validar_salida(cedula)
 
 		s = shelve.open(visita_db)
 
@@ -164,9 +202,13 @@ class VisitaControlador():
 
 		s[id_visita] = tmp_visita
 		s.close()
+		return tmp_visita
 
 	def ultima_visita(self, cedula):
-		"""Método para obtener la visita más reciente asociada a una persona, según su nro de cédula"""
+		"""
+			ultima_visita(str) -> Visita()
+			Método para obtener la visita más reciente asociada a una persona, según su nro de cédula
+		"""
 		
 		visitas = shelve.open(visita_db)
 
@@ -175,20 +217,69 @@ class VisitaControlador():
 		if visita_lista:
 			ultima_visita_id = sorted(visita_lista)[-1]
 		else:
-			raise Exception("No existen registros de visitas para la cédula indicada")
+			raise NoTieneVisita("No existen registros de visitas para la cédula indicada")
 
 		ultima_visita = visitas[str(ultima_visita_id)]
 		visitas.close()
 
 		return ultima_visita
+
+class VisitaMenorControlador(VisitaControlador):
+	def marcar_entrada(self, cedula, cedula_adulto):
+		id_visitante = cedula
+
+		existe_persona = PersonaControlador().existe(cedula)
+
+		if existe_persona:
+			try:
+				self.validar_entrada(cedula)
+			except NoTieneVisita:
+				pass	# No existe ninguna visita para esta cédula. La validación de entrada no fue necesaria.
+
+			s = shelve.open(visita_db)
+
+			total_registros = len(s)
+			id_visita = str(total_registros + 1)
+
+			fecha_visita = util.fecha_actual()
+			hora_entrada = util.hora_actual()
+
+			v = VisitaMenor(cedula_adulto=cedula_adulto, id_visita=id_visita, 
+						id_visitante=id_visitante, fecha_visita=fecha_visita, 
+						hora_entrada=hora_entrada)
+
+			s[id_visita] = v
+			return v
+
+		else:
+			v = None
+			raise Exception("No existe una persona con la cédula indicada.")
 		
-# class VisitaControlador(ControladorMaster):
-	""" introducir CI. Si no existe CI, pedir datos de la persona. Luego de cargar datos, o luego de comprobar existencia, permiter a 
-		usuario hacer click sobre algo que diga "marcar entrada". Esto debe crear un nuevo registro en la tabla de visitas que se autoincrementara, 
-		tendra la CI de persona, hora entrada y hora salida.
-		Hora salida se podrá marcar luego.
-	"""
+class AlquilableControlador():
 
-#	pass
+	def alquilar(self):
+		pass
 	
+	def devolver(self):
+		pass
 
+class BicicletaControlador(AlquilableControlador):
+	def crear(self, **kwargs):
+
+		s = shelve.open(bici_db)
+		total_registros = len(s)
+
+		id_num = total_registros + 1
+
+		b = Bicicleta(id_num=id_num, marca=kwargs['marca'],
+					estado="DISPONIBLE")
+
+		s[str(id_num)] = b
+
+		s.close()
+	
+	def alquilar(self):
+		pass
+
+	def devolver(self):
+		pass
