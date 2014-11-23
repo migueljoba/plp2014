@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block tabla %}
+
+<form method="POST" action="/marca_entrada">
+	<table>
+		<tr>
+	 		<th>C.I.:</th>
+	 		<td name="cedula">4212111</td>
+		</tr>
+
+		<tr>
+	 		<th>Nombre:</th>
+	 		<td>Miguel José</td>
+		</tr>
+
+		<tr>
+	 		<th>Apellido:</th>
+	 		<td>Báez Lovera</td>
+		</tr>
+
+		<tr>
+	 		<th>Edad:</th>
+	 		<td>25 </td>
+		</tr>
+
+		<tr>
+	 		<th>Sexo:</th>
+	 		<td>M</td>
+		</tr>
+
+	</table>
+
+	<input type="submit" name="entrada" value="Marcar entrada">
+	<input type="submit" name="salida" value="Marcar salida">
+</form>
+{% endblock tabla %}
