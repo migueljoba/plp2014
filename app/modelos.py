@@ -1,8 +1,8 @@
-def coalesce(objeto, default):
-    if not objeto: 
+def coalesce(dato, default):
+    if dato is None: 
         return default
     else:
-        return objeto
+        return dato
 
 class Persona():
 	def __init__(self, cedula=None, nombre=None, apellido=None, edad=None, sexo=None, **kwargs):
@@ -43,7 +43,7 @@ class Persona():
 		self.__sexo = sexo
 
 	def __str__(self):
-		return "Persona['%s','%s', '%s']" % (coalesce(self.__cedula, ''), coalesce(self.__nombre,''), coalesce(self.__apellido,''))
+		return "Cédula: %s \nNombre: %s \nApellido: %s \nEdad: %s \nSexo: %s" % (coalesce(self.__cedula, ''), coalesce(self.__nombre,''), coalesce(self.__apellido,''), coalesce(self.__edad,''), coalesce(self.__sexo,''))
 
 class Visita():
 	def __init__(self, id_visita=None, id_visitante=None, fecha_visita=None, hora_entrada=None, hora_salida=None, **kwargs):
@@ -84,18 +84,7 @@ class Visita():
 		self.__hora_salida = hora_salida
 
 	def __str__(self):
-		return "Visita ['%s','%s', '%s', '%s', '%s']" % (coalesce(self.__id_visita, ''), coalesce(self.__id_visitante,''), coalesce(self.__fecha_visita,''), coalesce(self.__hora_entrada,''), coalesce(self.__hora_salida,''))
-
-class PersonaMenor(Persona):	 # deprecar
-	def __init__(self, cedula_adulto=None, **kwargs):
-		super().__init__(**kwargs)
-		self.__cedula_adulto = cedula_adulto
-
-	def get_cedula_adulto(self):
-		return self.__cedula_adulto
-
-	def set_cedula_adulto(self, cedula_adulto):
-		self.__cedula_adulto = cedula_adulto
+		return "Visita nro.: '%s' \nCédula: %s \nFecha: %s \nEntrada: %s \nSalida: %s" % (coalesce(self.__id_visita, ''), coalesce(self.__id_visitante,''), coalesce(self.__fecha_visita,''), coalesce(self.__hora_entrada,''), coalesce(self.__hora_salida,'---'))
 
 class VisitaMenor(Visita):
 	def __init__(self, cedula_adulto=None, menor_edad=True, **kwargs):
@@ -162,8 +151,5 @@ class Bicicleta(Alquilable):
 		self.__marca
 
 	def __str__(self):
-		return "Bicicleta['%s','%s', '%s']" % (coalesce(self.__id_num, ''), coalesce(self.__marca,''), coalesce(self.__estado,''))
-
-
-# Para limitar número de instancias de la clase, ver
-# http://stackoverflow.com/questions/11458477/limit-number-of-class-instances-whith-python
+		# return "Bicicleta['%s','%s', '%s']" % (coalesce(self.__id_num, ''), coalesce(self.__marca,''), coalesce(self.__estado,''))
+		return "Bicicleta['%s','%s']" % (coalesce(self.__id_num, ''), coalesce(self.__marca,''))

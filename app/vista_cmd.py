@@ -53,8 +53,9 @@ def registrar_entrada():
 	p = PersonaControlador()
 	try:
 		persona = p.recuperar(cedula)
-	except NoExistePersona as ex:
+	except Exception as ex:
 		print(ex)
+		print("No se podrá registrar entrada.")
 		util.presiona_continuar()
 		menu_principal()
 
@@ -89,6 +90,8 @@ def registrar_salida():
 		print(visita)
 	except Exception as e:
 		print(e)
+	util.presiona_continuar()
+	util.limpiar_pantalla()
 
 def salir():
 	util.limpiar_pantalla()
@@ -107,6 +110,7 @@ def alquilar_bici():
 		cedula = util.leer_cadena("Ingrese el nro. de cédula del solicitante: ", requerido=True)
 		if not BicicletaControlador().validar_solicitante(cedula):
 			print("Esta cédula no corresponde a alguien presente en el parque.")
+			util.presiona_continuar()
 			return False
 
 		nro_solicitado = util.leer_entero("¿Cuántas desea alquilar?: ", min_val=1, max_val=20, requerido=True)
@@ -128,7 +132,44 @@ def alquilar_bici():
 
 def devolver_bici():
 	cedula = util.leer_cadena("Ingrese el nro. de cédula de quien devuelve: ", requerido=True)
+
+	# Correccion de bug en el examen: no validaba la persona.
+	if not BicicletaControlador().validar_solicitante(cedula):
+		print("Esta cédula no corresponde a alguien presente en el parque.")
+		return False
+	
+	lista_bici = BicicletaControlador().listar_por_cedula(cedula)
+
+	if lista_bici:
+		print("Se devuelve: ")
+		for b in lista_bici:
+			print(b)
+
 	BicicletaControlador().devolver(cedula)
+	util.presiona_continuar()
+
+def listar_segun_cedula():
+	mensaje = "Ingrese número de cédula del solicitante: "
+	cedula = util.leer_cadena(mensaje, requerido=True)
+
+	# valida presencia de la persona en el parque
+	if not BicicletaControlador().validar_solicitante(cedula):
+		print("Esta cédula no corresponde a alguien presente en el parque.")
+		return False
+
+
+	p = PersonaControlador().recuperar(cedula)
+
+	lista_bici = BicicletaControlador().listar_por_cedula(cedula)
+
+	if lista_bici:
+		print(p)
+		print("Posee actualmente {0} bicicleta(s): ".format(len(lista_bici)))
+		for b in lista_bici:
+			print(b)
+	else:
+		print("Esta persona no alquiló bicicletas.")
+
 	util.presiona_continuar()
 
 def menu_bicicleta():
@@ -138,7 +179,8 @@ def menu_bicicleta():
 
 	menu_bici[1] = {titulo: "Alquilar", funcion: alquilar_bici}
 	menu_bici[2] = {titulo: "Devolver", funcion: devolver_bici}
-	menu_bici[3] = {titulo: "Volver al menú principal", funcion: menu_principal}
+	menu_bici[3] = {titulo: "Listar bicicletas según cédula del solicitante", funcion: listar_segun_cedula}
+	menu_bici[4] = {titulo: "Volver al menú principal", funcion: menu_principal}
 
 	while True:
 		# util.limpiar_pantalla()
@@ -160,9 +202,8 @@ def menu_principal():
 	menu_principal[2] = {titulo: "Registrar entrada", funcion: registrar_entrada}
 	menu_principal[3] = {titulo: "Registrar salida", funcion: registrar_salida}
 	menu_principal[4] = {titulo: "Registrar persona", funcion: registrar_persona}
-	menu_principal[5] = {titulo: "Listar ", funcion: salir}	 # TODO esto no está implementado todavía!! Ni hace falta :D
-	menu_principal[6] = {titulo: "Ir a menú de BICICLETAS", funcion: menu_bicicleta}
-	menu_principal[7] = {titulo: "Salir", funcion: salir}
+	menu_principal[5] = {titulo: "Ir a menú de BICICLETAS", funcion: menu_bicicleta}
+	menu_principal[6] = {titulo: "Salir", funcion: salir}
 
 	while True:
 		
@@ -172,7 +213,6 @@ def menu_principal():
 		print("-----------------------------------------------------------")
 		max_val = len(menu_principal)
 		opcion = util.leer_entero("Ingrese una opción: ", min_val=1, max_val=max_val, requerido=True)
-		# ejecutamos la opcion asociada al menú
 		menu_principal[opcion][funcion]()
 
 

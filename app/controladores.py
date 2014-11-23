@@ -11,44 +11,13 @@ bici_db = "bicicleta.db"
 
 class NoTieneVisita(Exception):
     pass
-class NoExistePersona(Exception):
+class NoExistePersona(Exception):	# deprecar esto. Causaba excepcion al intentar capturar esta exception
 	pass
 
-class ControladorMaster():	# deprecar
-	
-	def crear(objeto):
-		print("Llama a metodo crear()")
-		id_obj = objeto.get_cedula()
-
-		if s.has_key(id_obj):	 #deprecar
-			print("Ya existe esta persona")
-		s[id_obj] = objeto
-	
-	def listar_todo():
-		pass
-
-	def listar_por_estado():
-		pass
-
-	def valida_creacion(self, objeto):
-
-		id_obj = objeto.get_cedula()
-
-		if s.has_key(id_obj): # ya existe 
-			pass
-
-	@abstractmethod
-	def get_id_objeto(self, objeto):
-		pass
-	
-	@abstractmethod
-	def destruir(self, objeto):
-		pass
-
-class PersonaControlador(ControladorMaster):
+class PersonaControlador():
 
 	def crear(self, **kwargs):
-		
+		"""Función para crear un registro para una persona en la base de datos"""
 		p = Persona(cedula=kwargs['cedula'],
 					nombre=kwargs['nombre'],
 					apellido=kwargs['apellido'],
@@ -76,6 +45,7 @@ class PersonaControlador(ControladorMaster):
 		return exito
 
 	def validar_atributos(self, **kwargs):
+		"""Método que verifica la existencia de los atributos requeridos para la creación de una persona"""
 		attr_requerido = ["cedula", "nombre", "apellido", "sexo", "edad"]
 
 		for atr in attr_requerido:
@@ -85,7 +55,7 @@ class PersonaControlador(ControladorMaster):
 		# TODO validar contenido de los parámetros. Prioridad baja
 
 	def destruir(self, id_obj):		# plato de oro ?
-
+		"""Método para borrar el registro de una persona"""
 		s = shelve.open(persona_db)
 
 		if id_obj in s.keys():
@@ -116,7 +86,8 @@ class PersonaControlador(ControladorMaster):
 		"""Función que retorna el objeto Persona, si existe en la base datos"""
 		s = shelve.open(persona_db)
 		if cedula not in s.keys():
-			raise NoExistePersona("No existen registros para esta cédula.")
+			# Correcion de bug en examen: Intentaba hacer un raise de excepcion NoExistePersona y causaba otra excepcion.
+			raise Exception("No existen registros para esta cédula.")
 		tmp = s[cedula]
 		s.close()
 		
@@ -139,7 +110,7 @@ class VisitaControlador():
 		s.close()
 
 		if tmp_visita.get_hora_salida() is None:
-			raise Exception("No se podrá marcar entrada. Esta persona ya se encuentra dentro parque.")
+			raise Exception("No se podrá marcar entrada. Esta persona ya se encuentra dentro del parque.")
 
 	def validar_salida(self, cedula):
 		"""	
@@ -174,6 +145,7 @@ class VisitaControlador():
 			return True		# Ultima visita no tiene marcada hora de salida. Se encuentra en curso la visita.
 
 	def marcar_entrada(self, cedula):
+		"""Método para registrar la entrada de una persona al parque"""
 		id_visitante = cedula
 
 		existe_persona = PersonaControlador().existe(cedula)
@@ -202,6 +174,7 @@ class VisitaControlador():
 			raise Exception("No existe una persona con la cédula indicada.")
 
 	def marcar_salida(self, cedula):
+		"""Método para registrar la salida de una persona del parque"""
 		id_visita = self.validar_salida(cedula)
 
 		s = shelve.open(visita_db)
@@ -239,7 +212,10 @@ class VisitaControlador():
 		return ultima_visita
 
 class VisitaMenorControlador(VisitaControlador):
+	"""Clase para implementar la visita de un menor de edad al parque"""
+
 	def marcar_entrada(self, cedula, cedula_adulto):
+		"""Método para registrar la entrada de una persona al parque"""
 		id_visitante = cedula
 
 		existe_persona = PersonaControlador().existe(cedula)
@@ -269,11 +245,13 @@ class VisitaMenorControlador(VisitaControlador):
 			v = None
 			raise Exception("No existe una persona con la cédula indicada.")
 		
-class AlquilableControlador():
+class AlquilableControlador(metaclass=ABCMeta):
 
+	@abstractmethod
 	def alquilar(self):
 		pass
-	
+
+	@abstractmethod
 	def devolver(self):
 		pass
 
@@ -328,7 +306,7 @@ class BicicletaControlador(AlquilableControlador):
 	def validar_solicitante(self, cedula):
 		"""	validar_solicitante(str) -> Booleano
 			Determina si el solicitante se encuentra o no dentro dentro del parque; condición 
-			necesaria para alquilar.
+			necesaria para alquilar o devolver bicicleta.
 		"""
 		# la persona existe en BD y actualmente de visita?
 		if PersonaControlador().existe(cedula) and VisitaControlador().esta_adentro(cedula):
@@ -378,3 +356,12 @@ class BicicletaControlador(AlquilableControlador):
 
 		s.close()
 
+	def listar_por_cedula(self, cedula):
+		s = shelve.open(bici_db)
+
+		lista_no_disponible = [b.get_id_num() for b in s.values() if b.get_estado() != "DISPONIBLE"]
+
+		# genera una lista de objetos Bicicleta
+		lista_bici = [b for b in s.values() if b.get_cedula_solicitante() == cedula]
+
+		return lista_bici

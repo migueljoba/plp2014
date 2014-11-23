@@ -78,7 +78,7 @@ def leer_dato_binario(mensaje, opciones):
         val = input()
 
         if val in opciones:
-            return True
+            return val
         else:
             print("Ingresó un valor incorrecto. Las opciones son " + str(opciones))
 
