@@ -1,36 +1,34 @@
 {% extends "base.html" %}
-{% block tabla %}
+{% block contenido_dinamico %}
+
+<h3>{{ contexto.mensaje }}</h3>
 
 <form method="POST" action="/marca_entrada">
 	<table>
 		<tr>
 	 		<th>C.I.:</th>
-	 		<td name="cedula">4212111</td>
+	 		<td name="cedula">{{ contexto.objeto.cedula }}</td>
 		</tr>
-
 		<tr>
 	 		<th>Nombre:</th>
-	 		<td>Miguel José</td>
+	 		<td>{{ contexto.objeto.nombre }}</td>
 		</tr>
-
 		<tr>
 	 		<th>Apellido:</th>
-	 		<td>Báez Lovera</td>
+	 		<td>{{ contexto.objeto.apellido }}</td>
 		</tr>
-
 		<tr>
 	 		<th>Edad:</th>
-	 		<td>25 </td>
+	 		<td>{{ contexto.objeto.edad }}</td>
 		</tr>
-
 		<tr>
 	 		<th>Sexo:</th>
-	 		<td>M</td>
+	 		<td>{{ contexto.objeto.sexo }}</td>
 		</tr>
-
 	</table>
-
 	<input type="submit" name="entrada" value="Marcar entrada">
 	<input type="submit" name="salida" value="Marcar salida">
 </form>
-{% endblock tabla %}
+
+{{ contexto }}
+{% endblock %}

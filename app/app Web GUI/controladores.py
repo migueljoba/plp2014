@@ -8,6 +8,7 @@ import util
 persona_db = "persona.db"
 visita_db = "visitante.db"
 bici_db = "bicicleta.db"
+template_base = "base.html"
 
 class NoTieneVisita(Exception):
     pass
@@ -17,7 +18,7 @@ class NoExistePersona(Exception):	# deprecar esto. Causaba excepcion al intentar
 class PersonaControlador():
 
 	def crear(self, **kwargs):
-		"""Función para crear un registro para una persona en la base de datos"""
+		"""Método para crear un registro de persona en la base de datos"""
 		p = Persona(cedula=kwargs['cedula'],
 					nombre=kwargs['nombre'],
 					apellido=kwargs['apellido'],
@@ -25,24 +26,32 @@ class PersonaControlador():
 					edad=kwargs['edad']
 		)
 
+		# Instanciamos el objeto Respuesta
+		r = Respuesta()
+
 		print(p)
 
 		s = shelve.open(persona_db)
-		# preguntar si ya existe antes de guardar
 		
+		# preguntar si ya existe antes de guardar
 		if self.existe(p.get_cedula()):
-			print("Ya existe persona con esta cedula")
-			# cedula = p.get_cedula()
-			print(s[p.get_cedula()])
-			exito = False
+			# ya existe
+			r.mensaje = "Ya existe persona con esta cedula"
+			r.exito = False
+			t.template = template_base
 
 		else:
+			# no existe. Entonces, registrar
 			s[p.get_cedula()] = p
-			exito = True
-		
-		# s[p.get_cedula()] = p
+			r.mensaje = "Se registraron los datos exitosamente"
+			r.exito = True
+			r.template = "persona_tabla.html"
+
+		# parsea la instancia de Persona a un dict
+		r.objeto = util.objeto_a_diccionario(p)
+
 		s.close()
-		return exito
+		return r
 
 	def validar_atributos(self, **kwargs):
 		"""Método que verifica la existencia de los atributos requeridos para la creación de una persona"""
@@ -92,6 +101,28 @@ class PersonaControlador():
 		s.close()
 		
 		return tmp
+
+	def buscar(self, cedula):
+
+		# Instanciamos el objeto Respuesta
+		r = Respuesta()
+
+		if self.existe(cedula):
+			p = self.recuperar(cedula)
+
+			r.objeto = util.objeto_a_diccionario(p)
+			r.exito = True
+
+			# renderizar la tabla de datos de la persona
+			r.template = 'persona_tabla.html'
+
+		else:
+			r.mensaje = "No se encontró a ninguna persona con cédula {0} entre los registros. Puede registrarla completando el formulario.".format(cedula)
+	
+			# renderizar el formulario de registro de persona
+			r.template = 'formulario_persona.html'
+
+		return r
 
 class VisitaControlador():
 
@@ -365,3 +396,19 @@ class BicicletaControlador(AlquilableControlador):
 		lista_bici = [b for b in s.values() if b.get_cedula_solicitante() == cedula]
 
 		return lista_bici
+
+class Respuesta():
+	"""Clase para unificar la respuesta del controlador a la vista.
+	   Todo objeto Respuesta tendrá los sgtes. atributos:
+	   - 'objeto': Persona o Bicicleta y otros a ser implementados.
+	   - 'template': str con el nombre del archivo .html a renderizar. "base.html" por defecto.
+	   - 'exito': booleano que indica si la petición fracasó o no. False por defecto.
+	   - 'mensaje': str con información para el usuario. Cadena vacía por defecto.
+	"""
+	def __init__(self, objeto={}, template='base.html', exito=False, mensaje=''):
+		# Al no tener atributos privados no se necesitan ni setters ni getters.
+		self.objeto = objeto
+		self.template = template
+		self.exito = exito
+		self.mensaje = mensaje
+

@@ -22,10 +22,10 @@
 		border: 2px solid #efefef;
 		padding: 10px;
 	}
-	h1 {
+	h1, h2 {
 		color: #ffffff;
 	}
-	input[type="submit"] {
+	input[type="submit"], input[type="button"] {
 		padding: 4px 12px;
 		text-align: center;
 		vertical-align: middle !important;
@@ -41,11 +41,29 @@
 		margin: auto;
 	}
 	input[type="text"] {
-		border: 3px #d9d9d9 solid;
+		border: 2px #d9d9d9 solid;
 	}
-	th {
-		text-align: left;
-		width: 80px; 
+	table {
+		border-collapse: collapse;
+	}
+
+	td, th {
+	  border: 1px solid #999;
+	  padding: 0.5rem;
+	}
+	div.detail-box {
+		width: 250px;
+	}
+	div.form-detail {
+		height: 30px;
+		/*width: 250px;*/
+	}
+	.form-detail label {
+		width: 10px;
+		color: #ffffff;
+	}
+	.form-detail input[type=text]{
+		float: right;
 	}
 
 	</style>
@@ -59,7 +77,7 @@
 				<input type="text" id="cedula-input" name="cedula" value="">
 				<input type="submit" value="Buscar">
 			</form>
-		{% block tabla %}{% endblock%}
+		{% block contenido_dinamico %}{% endblock%}
 		</div>
 
 	</div>

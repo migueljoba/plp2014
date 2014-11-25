@@ -105,3 +105,22 @@ def hora_actual():
     """Función que retorna la hora actual"""
     return datetime.now().time()
 
+def objeto_a_diccionario(objeto):
+    """Parsea la instancia de una clase a un objeto diccionario, donde cada key es igual
+       al nombre del atributo, y cada value es igual al valor del respectivo atributo.
+       Sirve para no utilizar los métodos getters en la vista.
+    """
+    # obtiene la clase de la variable 'objeto'
+    nombre_clase = objeto.__class__.__name__
+
+    # variable que contiene el str que se quiere eliminar
+    str_basura = '_' + nombre_clase + '__'
+
+    # declaración del dict que contendrá el resultado
+    r = {}
+    for kw_clase, val in objeto.__dict__.items():
+        kw = kw_clase.replace(str_basura, '')
+        r[kw] = val
+
+    return r
+
