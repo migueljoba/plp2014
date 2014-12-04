@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block contenido_dinamico %}
+
+<h2>{{ contexto.mensaje }}</h2>
+
+<div class="detail-box">
+	<form action="/registrar_persona" method="POST">
+		<div class="form-detail">
+			<label for="id-cedula">Cédula</label>
+			<input type="text" id="id-cedula" name="cedula" value="{{ cedula }}">
+		</div>
+		<div class="form-detail">
+			<label for="id-nombre">Nombre</label>
+			<input type="text" id="id-nombre" name="nombre">
+		</div>
+		<div class="form-detail">
+			<label for="id-apellido">Apellido</label>
+			<input type="text" id="id-apellido" name="apellido">
+		</div>
+		<div class="form-detail">
+			<label for="id-edad">Edad</label>
+			<input type="text" id="id-edad" name="edad">
+		</div>
+		<div class="form-detail">
+			<label>Sexo</label>
+			<label class="gender masc" for="masc">Masc</label>
+			<input class="gender" type="radio" name="sexo" id="masc" value="M">
+			<label class="gender fem" for="fem">Fem</label>
+			<input class="gender" type="radio" name="sexo" id="fem" value="F">
+			<!--<input type="text" id="id-sexo" name="sexo"> -->
+		</div>
+		<div class="btn-container">
+			<a href="/"><input type="button" value="Ahora no"></a>
+			<input type="submit" value="Registrar persona">
+		</div>
+	</form>
+</div>
+
+{% endblock %}
+
+

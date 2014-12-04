@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title>Parque</title>
+<link rel="stylesheet" type="text/css" href="/static/estilo.css">
+</head>
+<body>
+	<div id="base-container">
+		<div class="header">
+			<h1>Registro de visitas y alquiler de bicicletas</h1>
+		</div>
+		<div id="tab-container">
+			<ul>
+				<li><a href="/">PORTERIA</a></li>
+				<li class="selected"><a>BICICLETAS</a></li>
+			</ul>
+		</div>
+		<div id="page-container">
+			<h1>¿Qué desea hacer?</h1>
+			<div class="btn-container">
+				<a href="/bici/alquilar"><input type="button" value="Alquilar"></a>
+				<a href="/bici/devolver"><input type="button" value="Devolver"></a>
+				<a href="/bici/config"><input type="button" value="Configuraciones"></a>
+			</div>
+			{% block contenido_dinamico %}
+			{% endblock %}
+
+			{% block info %}
+			{% endblock %}
+		</div>
+	</div>
+</body>
+</html>

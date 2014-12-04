@@ -1,0 +1,47 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h2>{{ contexto.mensaje }}</h2>
+
+	<div class="detail-box">
+		<form action="/bici/alquiler" method="POST">
+			<div class="form-detail">
+				<label for="id-cedula">Cédula</label>
+				<input type="text" id="id-cedula" name="cedula" value="{{ cedula }}">
+			</div>
+			<div class="form-detail">
+				<label for="id-cantidad">Cantidad</label>
+				<select id="id-cantidad" name="cantidad">
+					{% for c in contexto.cantidad %}
+					<option value="{{ c }}">{{ c }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			<div class="form-detail">
+				<label for="id-tiempo">Tiempo (horas)</label>
+				<input type="text" id="id-tiempo" name="tiempo">
+			</div>
+
+			<a href="/bici"><input type="button" value="Volver"></a>
+			<input type="submit" value="Alquilar bicicleta">
+		</form>
+	</div>
+
+	<div class="detail-box">
+		<form action="/bici/devolver" method="POST">
+			<div class="form-detail">
+				<label for="id-cedula">Cédula</label>
+				<input type="text" id="id-cedula" name="cedula" value="{{ cedula }}">
+			</div>
+			
+			<a href="/bici"><input type="button" value="Volver"></a>
+			<input type="submit" value="Devolver bicicleta">
+		</form>
+	</div>
+
+
+</body>
+</html>

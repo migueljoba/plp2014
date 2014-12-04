@@ -1,0 +1,32 @@
+{% extends "bici_base.html" %}
+{% block contenido_dinamico %}
+
+<h2>Alquilar Bicicletas</h2>
+
+<h2>Existen {{ contexto.nro }} bicicletas disponibles.</h2>
+
+<div class="detail-box">
+	<form action="/bici/alquilar" method="POST">
+		<div class="form-detail">
+			<label for="id-cedula">Cédula</label>
+			<input type="text" id="id-cedula" name="cedula" value="{{ cedula }}">
+		</div>
+		<div class="form-detail">
+			<label for="id-cantidad">Cantidad</label>
+			<select id="id-cantidad" name="cantidad" class="styled-select">
+				{% for c in contexto.cantidad %}
+				<option value="{{ c }}">{{ c }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="form-detail">
+			<label for="id-tiempo">Tiempo (horas)</label>
+			<input type="text" id="id-tiempo" name="tiempo">
+		</div>
+		<div class="btn-container">
+			<a href="/bici"><input type="button" value="Cancelar"></a>
+			<input type="submit" value="Alquilar bicicleta">
+		</div>
+	</form>
+</div>
+{% endblock %}

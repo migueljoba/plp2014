@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block contenido_dinamico %}
+
+<h2>{{ contexto.mensaje }}</h2>
+<div class="detail-box">
+	<form action="/marca_visita" method="POST">
+		<div class="form-detail">
+			<label for="id-cedula">Cédula</label>
+			<input type="text" id="id-cedula" name="cedula" value="{{ contexto.objeto.cedula }}" readonly>
+		</div>
+		<div class="form-detail">
+			<label for="id-nombre">Nombre</label>
+			<input type="text" id="id-nombre" name="nombre" value="{{ contexto.objeto.nombre }}" readonly>
+		</div>
+		<div class="form-detail">
+			<label for="id-apellido">Apellido</label>
+			<input type="text" id="id-apellido" name="apellido" value="{{ contexto.objeto.apellido }}" readonly>
+		</div>
+		<div class="form-detail">
+			<label for="id-edad">Edad</label>
+			<input type="text" id="id-edad" name="edad" value="{{ contexto.objeto.edad }}" readonly>
+		</div>
+		<div class="form-detail">
+			<label>Sexo</label>
+			<input type="text" id="id-sexo" name="sexo" value="{{ contexto.objeto.sexo }}" readonly>
+		</div>
+		<div class="btn-container">
+			<input type="submit" name="accion_visita" value="Marcar entrada">
+			<input type="submit" name="accion_visita" value="Marcar salida">
+		</div>
+	</form>
+</div>
+{% endblock %}

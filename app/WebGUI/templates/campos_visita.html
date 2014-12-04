@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block contenido_dinamico %}
+
+<h2>{{ contexto.mensaje }}</h2>
+<div class="detail-box">
+	<div class="form-detail">
+		<label for="id-visita">Visita N°</label>
+		<input type="text" id="id-visita" name="visita" value="{{ contexto.objeto.id_visita }}" readonly>
+	</div>
+	<div class="form-detail">
+		<label for="id-cedula">Cédula</label>
+		<input type="text" id="id-cedula" name="cedula" value="{{ contexto.objeto.id_visitante }}" readonly>
+	</div>
+	<div class="form-detail">
+		<label for="id-fecha">Fecha</label>
+		<input type="text" id="id-fecha" name="fecha" value="{{ contexto.objeto.fecha_visita }}" readonly>
+	</div>
+	<div class="form-detail">
+		<label for="id-entrada">Entrada</label>
+		<input type="text" id="id-entrada" name="entrada" value="{{ contexto.objeto.hora_entrada }}" readonly>
+	</div>
+	<div class="form-detail">
+		<label for="id-salida">Salida</label>
+		<input type="text" id="id-salida" name="salida" value="{{ contexto.objeto.hora_salida }}" readonly>
+	</div>
+	<a href="/"><input type="button" value="Volver"></a>
+</div>
+{% endblock %}
